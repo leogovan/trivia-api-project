@@ -3,7 +3,7 @@
 ################################################
 
 import os
-from flask import Flask, request, abort, jsonify
+from flask import Flask, json, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS, cross_origin
 import random
@@ -67,8 +67,22 @@ def create_app(test_config=None):
   @TODO: 
   Create an endpoint to handle GET requests 
   for all available categories.
+  -- DONE
   '''
+  @app.route('/categories', methods=['GET'])
+  def retrieve_categories():
+    selection = Category.query.order_by(Category.id).all()
 
+    list_of_categories = [category.format() for category in selection]
+    categories = {}
+    for i in list_of_categories:
+      value_one = i['id']
+      value_two = i['type']
+      categories[str(value_one)]=value_two
+
+    return jsonify({
+      'categories': categories
+    })
 
   '''
   @TODO: 
