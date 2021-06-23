@@ -1,3 +1,7 @@
+################################################
+#  Imports                                     #
+################################################
+
 import os
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -6,7 +10,29 @@ import random
 
 from models import setup_db, Question, Category
 
+################################################
+#  Global Variables                            #
+################################################
+
 QUESTIONS_PER_PAGE = 10
+
+################################################
+#  Helper Functions                            #
+################################################
+
+def paginate_questions(request, selection):
+  page = request.args.get('page', 1, type=int)
+  start =  (page - 1) * QUESTIONS_PER_PAGE
+  end = start + QUESTIONS_PER_PAGE
+
+  questions = [question.format() for question in selection]
+  current_questions = questions[start:end]
+
+  return current_questions
+
+################################################
+#  Instantiate app                             #
+################################################
 
 def create_app(test_config=None):
   # create and configure the app
@@ -15,11 +41,27 @@ def create_app(test_config=None):
   
   '''
   @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
+  -- DONE
   '''
+  CORS(app)
 
   '''
   @TODO: Use the after_request decorator to set Access-Control-Allow
+  -- DONE
   '''
+  ################################################
+  #  CORS                                        #
+  ################################################
+
+  @app.after_request
+  def after_request(response):
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,true')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,PATCH,DELETE,OPTIONS')
+    return response
+
+  ################################################
+  #  Endpoints                                   #
+  ################################################
 
   '''
   @TODO: 
