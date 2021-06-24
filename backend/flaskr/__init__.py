@@ -34,14 +34,15 @@ def paginate_questions(request, selection):
 ##### Get Categories From DB #####
 
 def get_categories():
-  selection = Category.query.order_by(Category.id).all()
+  category_query = Category.query.order_by(Category.id).all()
 
-  list_of_categories = [category.format() for category in selection]
-  categories = {}
-  for i in list_of_categories:
-    value_one = i['id']
-    value_two = i['type']
-    categories[str(value_one)]=value_two
+  categories = {cat.id:cat.type for cat in category_query}
+  # list_of_categories = [category.format() for category in category_query]
+  # categories = {}
+  # for i in list_of_categories:
+  #   value_one = i['id']
+  #   value_two = i['type']
+  #   categories[str(value_one)]=value_two
 
   return categories
 
