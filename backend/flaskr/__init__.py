@@ -20,6 +20,7 @@ QUESTIONS_PER_PAGE = 10
 #  Helper Functions                            #
 ################################################
 
+##### Pagination #####
 def paginate_questions(request, selection):
   page = request.args.get('page', 1, type=int)
   start =  (page - 1) * QUESTIONS_PER_PAGE
@@ -29,6 +30,20 @@ def paginate_questions(request, selection):
   current_questions = questions[start:end]
 
   return current_questions
+
+##### Get Categories From DB #####
+
+def get_categories():
+  selection = Category.query.order_by(Category.id).all()
+
+  list_of_categories = [category.format() for category in selection]
+  categories = {}
+  for i in list_of_categories:
+    value_one = i['id']
+    value_two = i['type']
+    categories[str(value_one)]=value_two
+
+  return categories
 
 ################################################
 #  Instantiate app                             #
@@ -77,27 +92,24 @@ def create_app(test_config=None):
   """
   Route handler to retrieve all categories. It is made up of:
   1. The DB query to get all categories
-  2. A list comprehension that uses the class method .format() that outputs 
+  2. Check to make sure the query returns results, If not, abort action
+  3. A list comprehension that uses the class method .format() that outputs 
      the DB record values to a dictionary, ready to be parsed into json
-  3. A loop that grabs the value from categories.id and categories.type
+  4. A loop that grabs the value from categories.id and categories.type
      and makes these the key and value respectively of a single dictionary
      (the output of the list comprehension was a list of dictionaries)
-  4. Return all of this as josn object that can be used by the front end
+  5. Return all of this as josn object that can be used by the front end
   """
   @app.route('/categories', methods=['GET'])
   def retrieve_categories():
-    selection = Category.query.order_by(Category.id).all()
+    categories = get_categories()
 
-    list_of_categories = [category.format() for category in selection]
-    categories = {}
-    for i in list_of_categories:
-      value_one = i['id']
-      value_two = i['type']
-      categories[str(value_one)]=value_two
+    if categories is {}:
+      abort(404)
 
     return jsonify({
-      'categories': categories,
-      'success': True
+      'success': True,
+      'categories': categories
     })
 
   '''
@@ -112,6 +124,24 @@ def create_app(test_config=None):
   ten questions per page and pagination at the bottom of the screen for three pages.
   Clicking on the page numbers should update the questions. 
   '''
+  @app.route('/questions', methods=['GET'])
+  def retrieve_questions():
+    selection = Question.query.all()
+    current_questions = paginate_questions(request, selection)
+
+    if len(current_questions) == 0:
+      abort(404)
+    
+    categories = get_categories()
+    
+    return jsonify({
+      'success': True,
+      'questions': current_questions,
+      'total_questons': len(selection),
+      'categories': categories,
+      'current_category': None
+    })
+
 
   '''
   @TODO: 
