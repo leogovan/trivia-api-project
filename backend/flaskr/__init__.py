@@ -55,8 +55,12 @@ def create_app(test_config=None):
 
   @app.after_request
   def after_request(response):
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,true')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,PATCH,DELETE,OPTIONS')
+    response.headers.add(
+      'Access-Control-Allow-Headers', 
+      'Content-Type,Authorization,true')
+    response.headers.add(
+      'Access-Control-Allow-Methods', 
+      'GET,PUT,POST,PATCH,DELETE,OPTIONS')
     return response
 
   ################################################
@@ -69,6 +73,17 @@ def create_app(test_config=None):
   for all available categories.
   -- DONE
   '''
+
+  """
+  Route handler to retrieve all categories. It is made up of:
+  1. The DB query to get all categories
+  2. A list comprehension that uses the class method .format() that outputs 
+     the DB record values to a dictionary, ready to be parsed into json
+  3. A loop that grabs the value from categories.id and categories.type
+     and makes these the key and value respectively of a single dictionary
+     (the output of the list comprehension was a list of dictionaries)
+  4. Return all of this as josn object that can be used by the front end
+  """
   @app.route('/categories', methods=['GET'])
   def retrieve_categories():
     selection = Category.query.order_by(Category.id).all()
@@ -81,7 +96,8 @@ def create_app(test_config=None):
       categories[str(value_one)]=value_two
 
     return jsonify({
-      'categories': categories
+      'categories': categories,
+      'success': True
     })
 
   '''
@@ -155,6 +171,58 @@ def create_app(test_config=None):
   including 404 and 422. 
   '''
   
+  ################################################
+  #  Error Handlers                              #
+  ################################################
+
+  @app.errorhandler(404)
+  def not_found(error):
+    return jsonify({
+        "success": False, 
+        "error": 404,
+        "message": "Not found: server cannot find the requested resource."
+        }), 404
+  
+  @app.errorhandler(422)
+  def unprocessable(error):
+    return jsonify({
+        "success": False, 
+        "error": 422,
+        "message": "Request is unprocessable."
+        }), 422
+  
+  @app.errorhandler(400)
+  def bad_request(error):
+    return jsonify({
+        "success": False, 
+        "error": 400,
+        "message": "Bad client request."
+        }), 400
+
+  @app.errorhandler(403)
+  def forbidden(error):
+    return jsonify({
+        "success": False, 
+        "error": 403,
+        "message": "Access forbidden."
+        }), 403
+  
+  @app.errorhandler(500)
+  def server_error(error):
+    return jsonify({
+        "success": False, 
+        "error": 500,
+        "message": "Internal server error."
+        }), 500
+  
+  @app.errorhandler(405)
+  def not_allowed(error):
+    return jsonify({
+        "success": False, 
+        "error": 405,
+        "message": "Request method not allowed."
+        }), 405
+
   return app
 
     
