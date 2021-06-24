@@ -35,15 +35,9 @@ def paginate_questions(request, selection):
 
 def get_categories():
   category_query = Category.query.order_by(Category.id).all()
-
-  categories = {cat.id:cat.type for cat in category_query}
-  # list_of_categories = [category.format() for category in category_query]
-  # categories = {}
-  # for i in list_of_categories:
-  #   value_one = i['id']
-  #   value_two = i['type']
-  #   categories[str(value_one)]=value_two
-
+  
+  categories = {category.id:category.type for category in category_query}
+  
   return categories
 
 ################################################
@@ -150,7 +144,25 @@ def create_app(test_config=None):
 
   TEST: When you click the trash icon next to a question, the question will be removed.
   This removal will persist in the database and when you refresh the page. 
+  -- DONE
   '''
+
+  @app.route('/questions/<int:question_id>', methods=['DELETE'])
+  def delete_question(question_id):
+    try:
+      question = Question.query.filter(Question.id == question_id).one_or_none()
+
+      if question is None:
+        abort(404)
+      
+      question.delete()
+
+      return jsonify({
+        'success': True
+      })
+    
+    except:
+      abort(422)
 
   '''
   @TODO: 
