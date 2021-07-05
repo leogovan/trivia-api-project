@@ -112,7 +112,7 @@ def create_app(test_config=None):
   Create an endpoint to handle GET requests for questions, 
   including pagination (every 10 questions). 
   This endpoint should return a list of questions, 
-  number of total questions, current category, categories. 
+  number of total questions, current category, categories. -- DONE
 
   TEST: At this point, when you start the application
   you should see questions and categories generated,
@@ -202,7 +202,7 @@ def create_app(test_config=None):
   @TODO: 
   Create a POST endpoint to get questions based on a search term. 
   It should return any questions for whom the search term 
-  is a substring of the question. 
+  is a substring of the question. -- DONE
 
   TEST: Search by any phrase. The questions list will update to include 
   only question that include that string within their question. 
@@ -231,13 +231,29 @@ def create_app(test_config=None):
 
   '''
   @TODO: 
-  Create a GET endpoint to get questions based on category. 
+  Create a GET endpoint to get questions based on category. --DONE
 
   TEST: In the "List" tab / main screen, clicking on one of the 
   categories in the left column will cause only questions of that 
   category to be shown. 
   '''
+  @app.route('/categories/<int:category_id>/questions', methods=['GET'])
+  def get_questions_by_category(category_id):
+    selection = Question.query.filter(Question.category == category_id).all()
+    current_questions = paginate_questions(request, selection)
 
+    if len(current_questions) == 0:
+      abort(404)
+    
+    categories = get_categories()
+    
+    return jsonify({
+      'success': True,
+      'questions': current_questions,
+      'total_questions': len(selection),
+      'categories': categories,
+      'current_category': None
+    })
 
   '''
   @TODO: 
