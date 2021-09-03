@@ -93,7 +93,7 @@ def create_app(test_config=None):
   4. A loop that grabs the value from categories.id and categories.type
      and makes these the key and value respectively of a single dictionary
      (the output of the list comprehension was a list of dictionaries)
-  5. Return all of this as josn object that can be used by the front end
+  5. Return all of this as json object that can be used by the front end
   """
   @app.route('/categories', methods=['GET'])
   def retrieve_categories():
@@ -266,11 +266,44 @@ def create_app(test_config=None):
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not. 
   '''
+  @app.route('/quizzes', methods=['POST'])
+  def play_quiz():
+    body = request.get_json()
+    category_id = body['quiz_category']['id']
+    previous_questions = body['previous_questions']
+
+    try:
+      if category_id == 0:
+        category_questions = Question.query.all()
+      else:
+        category_questions = Question.query.filter(Question.category == category_id).all()
+      
+      if not category_questions:
+        abort(422)
+
+      formatted_questions = []
+      for question in category_questions:
+        if question.id not in previous_questions:
+          formatted_questions.append(question.format())
+
+      if len(formatted_questions) != 0:
+        question_to_return = random.choice(formatted_questions)
+        return jsonify({
+          'success': True,
+          'question': question_to_return
+        })
+      else:
+        return jsonify({
+          'success': False
+        })
+    
+    except:
+      abort(422)
 
   '''
   @TODO: 
   Create error handlers for all expected errors 
-  including 404 and 422. 
+  including 404 and 422. -- DONE
   '''
   
   ################################################
