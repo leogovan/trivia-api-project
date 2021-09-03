@@ -266,6 +266,8 @@ def create_app(test_config=None):
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not. 
   '''
+
+  # This code is inspired by https://github.com/Merlin427/trivia_api/blob/master/backend/flaskr/__init__.py  
   @app.route('/quizzes', methods=['POST'])
   def play_quiz():
     body = request.get_json()
@@ -285,6 +287,8 @@ def create_app(test_config=None):
       for question in category_questions:
         if question.id not in previous_questions:
           formatted_questions.append(question.format())
+      
+      # print(len(formatted_questions))
 
       if len(formatted_questions) != 0:
         question_to_return = random.choice(formatted_questions)

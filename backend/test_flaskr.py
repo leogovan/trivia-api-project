@@ -63,7 +63,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['categories'])
         self.assertTrue(data['current_category'])
     
-    ##### Delete Questions Tests #####
+    ##### Delete Question Tests #####
     def test_delete_question(self):
         res = self.client().delete('/questions/5')
         data = json.loads(res.data)
@@ -79,6 +79,17 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 422)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], "Request is unprocessable.")
+    
+    ##### Create New Question Tests #####
+
+
+    ##### Search Questions Tests #####
+
+
+    ##### List Questions by Category Tests #####
+
+
+    ##### Play Quiz Tests #####
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
