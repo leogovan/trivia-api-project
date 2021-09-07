@@ -122,6 +122,8 @@ def create_app(test_config=None):
   @app.route('/questions', methods=['GET'])
   def retrieve_questions():
     selection = Question.query.all()
+    test_num = len(Question.query.all())
+    print(test_num)
     current_questions = paginate_questions(request, selection)
 
     if len(current_questions) == 0:
@@ -275,6 +277,8 @@ def create_app(test_config=None):
     category_id = body['quiz_category']['id']
     previous_questions = body['previous_questions']
 
+    #print("body['quiz_category']", body['quiz_category'])
+
     try:
       if category_id == 0:
         category_questions = Question.query.all()
@@ -288,8 +292,6 @@ def create_app(test_config=None):
       for question in category_questions:
         if question.id not in previous_questions:
           formatted_questions.append(question.format())
-      
-      # print(len(formatted_questions))
 
       if len(formatted_questions) != 0:
         question_to_return = random.choice(formatted_questions)
