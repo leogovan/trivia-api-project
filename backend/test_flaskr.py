@@ -69,7 +69,6 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['total_questions'])
         self.assertTrue(data['categories'])
-        self.assertTrue(data['current_category'])
         self.assertEqual(data['num_questions'], 10)
 
     def test_404_get_paginated_questions(self):
@@ -107,20 +106,20 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertGreater(num_questions_before, num_questions_after, "First value is not greater that second value.")
+        self.assertGreater(num_questions_after, num_questions_before, "First value is not greater than second value.")
 
-    def test_422_create_question(self):
-        res = self.client().post('/questions', json={'questions': "blah"})
+    def test_500_create_question(self):
+        res = self.client().post('/questions', json=None)
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 422)
+        self.assertEqual(res.status_code, 500)
         self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], "Request is unprocessable.")
+        self.assertEqual(data['message'], "Internal server error.")
 
 
     ##### Search Questions Tests #####
     def test_search_question(self):
-        res = self.client().post('/questions/search', json={'searchTerm': ""})
+        res = self.client().post('/questions/search', json={'searchTerm': "Which"})
 
     ##### List Questions by Category Tests #####
     def test_get_questions_by_category(self):
@@ -131,7 +130,6 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['total_questions'])
         self.assertTrue(data['categories'])
-        self.assertTrue(data['current_category'])
     
     def test_404_get_questions_by_category(self):
         res = self.client().get('/categories/999/questions')
@@ -152,15 +150,15 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['question'])
 
-    def test_404_play_quiz(self):
+    def test_422_play_quiz(self):
         res = self.client().post('/quizzes', json={
-            'quiz_category': {'type':'Science','id': 1},
+            'quiz_category': {'type':'Science','id': 7},
             'previous_questions':[20, 21, 22]})
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 404)
+        self.assertEqual(res.status_code, 422)
         self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], "Not found: server cannot find the requested resource.")
+        self.assertEqual(data['message'], "Request is unprocessable.")
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
