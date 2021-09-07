@@ -62,6 +62,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['total_questions'])
         self.assertTrue(data['categories'])
         self.assertTrue(data['current_category'])
+        self.assertEqual(data['num_questions'], 10)
     
     ##### Delete Question Tests #####
     def test_delete_question(self):
@@ -81,15 +82,20 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['message'], "Request is unprocessable.")
     
     ##### Create New Question Tests #####
-
+    def test_create_question(self):
+        pass
 
     ##### Search Questions Tests #####
-
+    def test_search_question(self):
+        pass
 
     ##### List Questions by Category Tests #####
-
+    def test_get_questions_by_category(self):
+        pass
 
     ##### Play Quiz Tests #####
+    def test_play_quiz(self):
+        pass
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
