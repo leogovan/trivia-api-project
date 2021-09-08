@@ -32,7 +32,11 @@ def paginate_questions(request, selection):
   return current_questions
 
 ##### Get Categories From DB #####
-
+"""
+There are a number of route handlers that rely on getting the categories.
+To make things a bit more concise, this helper function allows those handlers
+to get them without having to repeat the same code over and over.
+"""
 def get_categories():
   category_query = Category.query.order_by(Category.id).all()
   
@@ -161,7 +165,8 @@ def create_app(test_config=None):
       question.delete()
 
       return jsonify({
-        'success': True
+        'success': True,
+        'deleted_question_id': question_id
       })
     
     except:
@@ -195,7 +200,11 @@ def create_app(test_config=None):
       question.insert()
 
       return jsonify({
-        'success': True
+        'success': True,
+        'question': new_question,
+        'answer': new_answer,
+        'difficulty': new_difficulty,
+        'category': new_category
       })
 
     except:
